@@ -51,11 +51,6 @@
           "color": "#2563EB"
         }
       ]
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "omnimail-enterprise-cloud"
-      }
-    }
+    ]
   }
 }
