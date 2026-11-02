@@ -25,7 +25,7 @@
         "NSCameraUsageDescription": "OmniMail needs camera access to capture document attachments.",
         "NSPhotoLibraryUsageDescription": "OmniMail needs photo access to upload email attachments."
       }
-    ],
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -48,11 +48,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/notification-icon.png",
-          "color": "#2563EB",
-          "sounds": [
-            "./assets/chime.wav"
-          ]
+          "color": "#2563EB"
         }
       ]
     ],

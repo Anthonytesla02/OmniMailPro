@@ -16,7 +16,7 @@ Push your code to **GitHub**, **GitLab**, or **Bitbucket**:
 ```bash
 git init
 git add .
-git commit -m "Initial commit for OmniMail Expo app"
+git commit -m "Fix: Valid app.json syntax and Node 22.14.0 for Codemagic"
 git remote add origin https://github.com/your-username/omnimail-expo.git
 git push -u origin main
 ```
@@ -27,26 +27,16 @@ git push -u origin main
 3. Select this repository (`omnimail-expo`).
 4. Codemagic automatically detects the root `codemagic.yaml` file.
 
-### 3. Configure Environment Variables (Optional for Signing)
-In Codemagic under **Teams / Applications > Environment Variables**:
-- For Google Play: Add group `google_play` with `GCLOUD_SERVICE_ACCOUNT_CREDENTIALS` (JSON key).
-- For iOS: Upload your App Store Connect API Key or Certificate in Codemagic's **Code Signing identities**.
+### 3. Build Environment Configuration
+The updated `codemagic.yaml` now specifies:
+- **Node.js**: `22.14.0` (resolves all outdated engine warnings and `@react-native/dev-middleware` requirements)
+- **Java**: `17`
+- **Expo SDK**: Pinned to stable `^52.0.0` with `react-native@0.76.2` to prevent npx from pulling unverified experimental builds.
+- **app.json**: Validated syntax and localized assets (`./assets/icon.png`, `./assets/splash.png`, `./assets/adaptive-icon.png`).
 
 ### 4. Trigger Cloud Build
 1. In Codemagic, click **"Start new build"**.
 2. Select the workflow:
    - `expo-android-release` (Linux x2 VM)
    - `expo-ios-release` (macOS Apple Silicon VM)
-3. Codemagic runs `expo prebuild`, builds native binaries with Gradle / Xcode, signs artifacts, and automatically sends download links to `buybesttraffic@gmail.com`.
-
----
-
-## 📱 Features
-
-- **10+ Multi-Account Management**: Connect 10, 15, 20+ accounts with distinct color badges, category tags, signatures, and unread counts.
-- **Unified Multi-Inbox**: Stream all business emails into one unified feed with account pills.
-- **Collapsible Mobile Drawer**: Access all accounts, folders, and custom business categories.
-- **Native Bottom Navigation**: 5-tab mobile navigation (`Inboxes`, `Accounts`, `Folders`, `Alerts`, `Codemagic`).
-- **Push Notifications Engine**: Individual notification rules per inbox (VIP only, sound chime, quiet hours, Web Push API).
-- **Custom Business Folders**: Organize emails into *Invoices & Billing*, *VIP Clients*, *Contracts*, *Deliveries*, plus custom folders.
-- **Business Composer**: Send emails from any connected account with pre-built business templates.
+3. Codemagic will run `npx expo prebuild --platform android --clean --no-install`, build native binaries with Gradle / Xcode, sign artifacts, and automatically send download links to `buybesttraffic@gmail.com`.
