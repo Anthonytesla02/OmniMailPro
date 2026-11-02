@@ -24,15 +24,14 @@ workflows:
           include: true
           source: true
     scripts:
-      - name: Install Dependencies & Expo
+      - name: Install dependencies & align Expo SDK versions
         script: |
           npm install --legacy-peer-deps
-          npm install -g eas-cli
-          # Ensure Expo SDK 52 is installed locally so npx does not pull mismatched experimental versions
-          npm install expo@^52.0.0 react-native@0.76.2 expo-notifications@~0.29.0 expo-status-bar --save-exact --legacy-peer-deps
+          # Run expo install --fix to align all native Expo modules with SDK 52
+          npx expo install --fix
       - name: Expo Prebuild (Generate Native Android Project)
         script: |
-          npx expo prebuild --platform android --clean --no-install
+          npx expo prebuild --platform android --clean
       - name: Set Android SDK Location
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
@@ -40,7 +39,7 @@ workflows:
         script: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease bundleRelease
+          ./gradlew clean assembleRelease bundleRelease --no-daemon --stacktrace
     artifacts:
       - android/app/build/outputs/apk/release/*.apk
       - android/app/build/outputs/bundle/release/*.aab
@@ -74,13 +73,13 @@ workflows:
         - pattern: 'main'
           include: true
     scripts:
-      - name: Install Dependencies & Expo
+      - name: Install dependencies & align Expo SDK versions
         script: |
           npm install --legacy-peer-deps
-          npm install expo@^52.0.0 react-native@0.76.2 expo-notifications@~0.29.0 expo-status-bar --save-exact --legacy-peer-deps
+          npx expo install --fix
       - name: Expo Prebuild for iOS
         script: |
-          npx expo prebuild --platform ios --clean --no-install
+          npx expo prebuild --platform ios --clean
       - name: Install CocoaPods
         script: |
           cd ios && pod install
@@ -176,12 +175,10 @@ export const EXPO_PACKAGE_JSON = `{
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~52.0.0",
-    "expo-notifications": "~0.29.0",
-    "expo-status-bar": "~2.0.0",
-    "expo-secure-store": "~14.0.0",
+    "expo": "~52.0.37",
+    "expo-notifications": "~0.29.13",
+    "expo-status-bar": "~2.0.1",
     "react": "18.3.1",
-    "react-native": "0.76.2",
-    "lucide-react-native": "^0.460.0"
+    "react-native": "0.76.7"
   }
 }`;
