@@ -26,8 +26,8 @@ workflows:
     scripts:
       - name: Install dependencies & align Expo SDK versions
         script: |
+          npm config set legacy-peer-deps true
           npm install --legacy-peer-deps
-          # Run expo install --fix to align all native Expo modules with SDK 52
           npx expo install --fix
       - name: Expo Prebuild (Generate Native Android Project)
         script: |
@@ -75,6 +75,7 @@ workflows:
     scripts:
       - name: Install dependencies & align Expo SDK versions
         script: |
+          npm config set legacy-peer-deps true
           npm install --legacy-peer-deps
           npx expo install --fix
       - name: Expo Prebuild for iOS
@@ -179,6 +180,6 @@ export const EXPO_PACKAGE_JSON = `{
     "expo-notifications": "~0.29.13",
     "expo-status-bar": "~2.0.1",
     "react": "18.3.1",
-    "react-native": "0.76.7"
+    "react-native": "0.76.9"
   }
 }`;
