@@ -1,0 +1,6 @@
+{
+  "name": "OmniMail Pro - Multi-Inbox Business Suite & Expo Mobile",
+  "description": "Enterprise multi-account Gmail and business email client supporting 10+ accounts with instant switching, custom folder organization, per-inbox push notifications, and Codemagic CI/CD export for Expo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

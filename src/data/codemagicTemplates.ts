@@ -1,0 +1,187 @@
+export const CODEMAGIC_YAML = `# codemagic.yaml
+# Production CI/CD workflow for OmniMail Expo App (Android APK/AAB & iOS IPA)
+# Documentation: https://docs.codemagic.io/yaml-quick-start/
+
+workflows:
+  expo-android-release:
+    name: OmniMail Expo Android Release
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      node: 20.18.0
+      java: 17
+      groups:
+        - google_play # Defined in Codemagic environment variables
+      vars:
+        PACKAGE_NAME: "com.omnimail.business"
+        EXPO_PUBLIC_API_URL: "https://api.omnimail.app"
+    triggering:
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+          source: true
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm ci
+          npm install -g eas-cli
+      - name: Expo Prebuild (Generate Native Android Project)
+        script: |
+          npx expo prebuild --platform android --clean
+      - name: Set Android SDK Location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
+      - name: Build Android Release APK & AAB
+        script: |
+          cd android
+          ./gradlew assembleRelease bundleRelease
+    artifacts:
+      - android/app/build/outputs/apk/release/*.apk
+      - android/app/build/outputs/bundle/release/*.aab
+    publishing:
+      email:
+        recipients:
+          - buybesttraffic@gmail.com
+        notify:
+          success: true
+          failure: true
+
+  expo-ios-release:
+    name: OmniMail Expo iOS Release (IPA)
+    max_build_duration: 90
+    instance_type: mac_mini_m2
+    environment:
+      ios_signing:
+        distribution_type: ad_hoc # or app_store
+        bundle_identifier: com.omnimail.business
+      vars:
+        BUNDLE_ID: "com.omnimail.business"
+        XCODE_WORKSPACE: "ios/OmniMail.xcworkspace"
+        XCODE_SCHEME: "OmniMail"
+      node: 20.18.0
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+    scripts:
+      - name: Install npm packages
+        script: |
+          npm ci
+      - name: Expo Prebuild for iOS
+        script: |
+          npx expo prebuild --platform ios --clean
+      - name: Install CocoaPods
+        script: |
+          cd ios && pod install
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      - name: Build ipa for distribution
+        script: |
+          xcode-project build-ipa \\
+            --workspace "$XCODE_WORKSPACE" \\
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      email:
+        recipients:
+          - buybesttraffic@gmail.com
+        notify:
+          success: true
+          failure: true
+`;
+
+export const EXPO_APP_JSON = `{
+  "expo": {
+    "name": "OmniMail Business Suite",
+    "slug": "omnimail-multi-account",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F172A"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.omnimail.business",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "remote-notification",
+          "fetch"
+        ],
+        "NSCameraUsageDescription": "OmniMail needs camera access to capture document attachments.",
+        "NSPhotoLibraryUsageDescription": "OmniMail needs photo access to upload email attachments."
+      }
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F172A"
+      },
+      "package": "com.omnimail.business",
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "POST_NOTIFICATIONS",
+        "INTERNET",
+        "WAKE_LOCK"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#2563EB",
+          "sounds": [
+            "./assets/chime.wav"
+          ]
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "omnimail-enterprise-cloud"
+      }
+    }
+  }
+}`;
+
+export const EXPO_PACKAGE_JSON = `{
+  "name": "omnimail-expo-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~52.0.0",
+    "expo-notifications": "~0.29.0",
+    "expo-status-bar": "~2.0.0",
+    "expo-secure-store": "~14.0.0",
+    "react": "18.3.1",
+    "react-native": "0.76.2",
+    "lucide-react-native": "^0.460.0"
+  }
+}`;
